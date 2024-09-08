@@ -10,6 +10,8 @@ import com.atsumeru.web.model.book.service.BoundService;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +20,9 @@ import java.util.Optional;
 import static com.atsumeru.web.helper.JSONLogHelper.putJSON;
 
 public class BookInfo {
+
+    // Объявление логгера
+    private static final Logger logger = LoggerFactory.getLogger(BookInfo.class);
 
     public static JSONObject toJSON(BookArchive archive, List<BoundService> boundServices) throws JSONException {
         JSONObject obj = new JSONObject();
@@ -106,8 +111,6 @@ public class BookInfo {
         archive.setAltTitle(JSONHelper.getStringSafe(obj, "alt_title"));
         archive.setJapTitle(JSONHelper.getStringSafe(obj, "jap_title"));
         archive.setKorTitle(JSONHelper.getStringSafe(obj, "kor_title"));
-        // TODO: add synonyms support
-//        archive.setSynonyms(JSONHelper.getStringSafe(obj, "synonyms"));
 
         // Main info
         List<String> authors = JSONHelper.getStringList(obj, "authors");
@@ -162,9 +165,36 @@ public class BookInfo {
         archive.setRating(JSONHelper.getIntSafe(obj, "rating", 0));
 
         // BoundServices
-        archive.setBoundServices(getBoundServices(obj));
+        List<BoundService> boundServices = getBoundServices(obj);
+        archive.setBoundServices(boundServices);
 
         return true;
+    }
+
+    // Метод для извлечения bound_services из JSON
+    private static List<BoundService> getBoundServices(JSONObject obj) {
+        List<BoundService> boundServices = new ArrayList<>();
+        JSONArray servicesArray = JSONHelper.getArraySafe(obj, "bound_services");
+
+        if (servicesArray != null) {
+            for (Object object : servicesArray) {
+                if (object instanceof JSONObject) {
+                    JSONObject servicesObject = (JSONObject) object;
+
+                    ServiceType serviceType = EnumUtils.valueOfOrNull(ServiceType.class, JSONHelper.getStringSafe(servicesObject, "service_type"));
+                    if (serviceType != null) {
+                        String id = JSONHelper.getStringSafe(servicesObject, "id");
+                        String link = JSONHelper.getStringSafe(servicesObject, "link");
+
+                        if (StringUtils.isNotEmpty(id)) {
+                            boundServices.add(new BoundService(serviceType, id, link));
+                        }
+                    }
+                }
+            }
+        }
+
+        return boundServices;
     }
 
     public static JSONObject toJson(BookChapter chapter) {
@@ -272,30 +302,6 @@ public class BookInfo {
         } catch (Exception ex) {
             return -1;
         }
-    }
-
-    private static List<BoundService> getBoundServices(JSONObject obj) {
-        List<BoundService> boundServices = new ArrayList<>();
-        JSONArray servicesArray = JSONHelper.getArraySafe(obj, "bound_services");
-        if (servicesArray != null) {
-            for (Object object : servicesArray) {
-                if (object instanceof JSONObject) {
-                    JSONObject servicesObject = (JSONObject) object;
-
-                    ServiceType serviceType = EnumUtils.valueOfOrNull(ServiceType.class, JSONHelper.getStringSafe(servicesObject, "service_type"));
-                    if (serviceType != null) {
-                        String id = JSONHelper.getStringSafe(servicesObject, "id");
-                        String link = JSONHelper.getStringSafe(servicesObject, "link");
-
-                        if (StringUtils.isNotEmpty(id)) {
-                            boundServices.add(new BoundService(serviceType, id, link));
-                        }
-                    }
-                }
-            }
-        }
-
-        return boundServices;
     }
 
     public static void putHashes(JSONObject obj, String serieHash, String archiveHash) {

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -90,9 +91,15 @@ public class AtsumeruExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(new AtsumeruException(exception.getMessage()), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
+    // Добавлен обработчик RequestRejectedException
+    @ExceptionHandler(RequestRejectedException.class)
+    protected ResponseEntity<AtsumeruException> handleRequestRejectedException(RequestRejectedException ex) {
+        return new ResponseEntity<>(new AtsumeruException("Error 400: Bad request."), HttpStatus.BAD_REQUEST);
+    }
+
     @Data
     @AllArgsConstructor
-    private static class AtsumeruException {
+    public static class AtsumeruException { // Сделан публичным
         @Expose
         private String message;
     }

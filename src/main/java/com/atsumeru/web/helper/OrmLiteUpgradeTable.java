@@ -65,6 +65,7 @@ public class OrmLiteUpgradeTable {
             TableUtils.createTable(connectionSource, clazz);
 
             //get TableInfo form the new class which gives us a convenient method .hasColumnName()
+            @SuppressWarnings("unchecked")
             TableInfo tableInfo = new TableInfo(connectionSource, (BaseDaoImpl) dao, clazz);
 
             log("migrateTable() created new table '" + tableName + "', building column lists to copy values from old (renamed) table...");

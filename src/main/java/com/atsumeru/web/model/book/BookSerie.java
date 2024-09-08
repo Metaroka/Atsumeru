@@ -58,31 +58,31 @@ public class BookSerie extends BaseBook {
     private Boolean isSingle;
 
     // Bound Services IDs
-    @DatabaseField(columnName = DatabaseFields.MAL_ID)
+    @DatabaseField(columnName = "MAL_ID")
     private String malId;
 
-    @DatabaseField(columnName = DatabaseFields.SHIKIMORI_ID)
+    @DatabaseField(columnName = "SHIKIMORI_ID")
     private String shikimoriId;
 
-    @DatabaseField(columnName = DatabaseFields.KITSU_ID)
+    @DatabaseField(columnName = "KITSU_ID")
     private String kitsuId;
 
-    @DatabaseField(columnName = DatabaseFields.ANILIST_ID)
+    @DatabaseField(columnName = "ANILIST_ID")
     private String aniListId;
 
-    @DatabaseField(columnName = DatabaseFields.MANGAUPDATES_ID)
+    @DatabaseField(columnName = "MANGAUPDATES_ID")
     private String mangaUpdatesID;
 
-    @DatabaseField(columnName = DatabaseFields.ANIMEPLANET_ID)
+    @DatabaseField(columnName = "ANIMEPLANET_ID")
     private String animePlanetId;
 
-    @DatabaseField(columnName = DatabaseFields.COMICVINE_ID)
+    @DatabaseField(columnName = "COMICVINE_ID")
     private String comicVineId;
 
-    @DatabaseField(columnName = DatabaseFields.COMICSDB_ID)
+    @DatabaseField(columnName = "COMICSDB_ID")
     private String comicsDBId;
 
-    @DatabaseField(columnName = DatabaseFields.HENTAG_ID)
+    @DatabaseField(columnName = "HENTAG_ID")
     private String hentagId;
 
     @Expose
@@ -120,20 +120,20 @@ public class BookSerie extends BaseBook {
 
     public void prepareBoundServices() {
         boundServices = Optional.of(
-                Stream.of(
-                        new Pair<>(ServiceType.MYANIMELIST, malId),
-                        new Pair<>(ServiceType.SHIKIMORI, shikimoriId),
-                        new Pair<>(ServiceType.KITSU, kitsuId),
-                        new Pair<>(ServiceType.ANILIST, aniListId),
-                        new Pair<>(ServiceType.MANGAUPDATES, mangaUpdatesID),
-                        new Pair<>(ServiceType.ANIMEPLANET, animePlanetId),
-                        new Pair<>(ServiceType.COMICVINE, comicVineId),
-                        new Pair<>(ServiceType.COMICSDB, comicsDBId),
-                        new Pair<>(ServiceType.HENTAG, hentagId)
-                )
-                        .filter(pair -> StringUtils.isNotEmpty(pair.getSecond()))
-                        .map(pair -> new BoundService(pair.getFirst(), pair.getSecond()))
-                        .collect(Collectors.toList()))
+                        Stream.of(
+                                        new Pair<>(ServiceType.MYANIMELIST, malId),
+                                        new Pair<>(ServiceType.SHIKIMORI, shikimoriId),
+                                        new Pair<>(ServiceType.KITSU, kitsuId),
+                                        new Pair<>(ServiceType.ANILIST, aniListId),
+                                        new Pair<>(ServiceType.MANGAUPDATES, mangaUpdatesID),
+                                        new Pair<>(ServiceType.ANIMEPLANET, animePlanetId),
+                                        new Pair<>(ServiceType.COMICVINE, comicVineId),
+                                        new Pair<>(ServiceType.COMICSDB, comicsDBId),
+                                        new Pair<>(ServiceType.HENTAG, hentagId)
+                                )
+                                .filter(pair -> StringUtils.isNotEmpty(pair.getSecond()))
+                                .map(pair -> new BoundService(pair.getFirst(), pair.getSecond()))
+                                .collect(Collectors.toList()))
                 .filter(ArrayUtils::isNotEmpty)
                 .orElse(null);
     }

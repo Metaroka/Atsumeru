@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.lang.reflect.InvocationTargetException;
 
 public class BooksDaoManager extends BaseDaoManager {
     public static final long DB_VERSION = 2;
@@ -124,6 +125,7 @@ public class BooksDaoManager extends BaseDaoManager {
                     ? dao.update(item)
                     : dao.create(item);
         } catch (SQLException ex) {
+            logger.error("Error saving item: " + ex.getMessage(), ex);
             return -1;
         }
     }
@@ -161,9 +163,9 @@ public class BooksDaoManager extends BaseDaoManager {
                 .where()
                 .isNull(IS_SINGLE_FIELD_NAME)
                 .query().forEach(it -> {
-            it.setIsSingle(false);
-            save(it);
-        });
+                    it.setIsSingle(false);
+                    save(it);
+                });
     }
 
     public <T> boolean refresh(T item, Class<T> clazz) {
@@ -175,7 +177,14 @@ public class BooksDaoManager extends BaseDaoManager {
     }
 
     public synchronized boolean save(BookSerie item) {
-        return createOrUpdate(seriesDao, item, item.getDbId() != null) > 0;
+
+        // Вызов метода fromBoundServicesToIds() для корректной установки идентификаторов сервисов
+        item.fromBoundServicesToIds();
+
+        boolean result = createOrUpdate(seriesDao, item, item.getDbId() != null) > 0;
+        //logger.info("Serie saved successfully: " + result);
+
+        return result;
     }
 
     public synchronized <T> boolean save(T item) {
@@ -350,6 +359,7 @@ public class BooksDaoManager extends BaseDaoManager {
         return new ArrayList<>();
     }
 
+    @SuppressWarnings("unchecked")
     public <T, C> C queryById(Long id, Class<T> clazz) {
         try {
             if (clazz.isAssignableFrom(BookArchive.class)) {
@@ -381,8 +391,8 @@ public class BooksDaoManager extends BaseDaoManager {
         }
 
         try {
-            return (C) clazz.newInstance();
-        } catch (InstantiationException | IllegalAccessException ex) {
+            return (C) clazz.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
             ex.printStackTrace();
             return null;
         }
@@ -535,6 +545,7 @@ public class BooksDaoManager extends BaseDaoManager {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public <T, C> List<C> queryLike(String likeColumn, String like, Class<T> clazz) {
         try {
             return (List<C>) getDao(clazz).queryBuilder()
@@ -721,7 +732,7 @@ public class BooksDaoManager extends BaseDaoManager {
                     isChapterFieldNeedsToBeNull = false;
                 }
 
-                 Where<History, String> whereQuery = historyDao.queryBuilder()
+                Where<History, String> whereQuery = historyDao.queryBuilder()
                         .where()
                         .eq(fieldName, hash)
                         .and()
