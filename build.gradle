@@ -62,7 +62,8 @@ dependencies {
     implementation "org.apache.tomcat.embed:tomcat-embed-jasper"
 
     // Logs
-    implementation "ch.qos.logback:logback-classic:1.5.8"
+    implementation 'ch.qos.logback:logback-classic:1.2.10'  // 1.2.10
+
 
     // CLI ProgressBar
     implementation 'me.tongfei:progressbar:0.10.1'
