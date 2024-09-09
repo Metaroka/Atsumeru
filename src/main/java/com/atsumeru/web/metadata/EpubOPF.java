@@ -5,7 +5,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
 import org.jsoup.select.Elements;
 
 import java.io.InputStream;
@@ -29,7 +29,7 @@ public class EpubOPF {
 
             String description = Optional.ofNullable(opf.selectFirst("metadata > dc|description"))
                     .map(Element::text)
-                    .map(value -> Jsoup.clean(value, Whitelist.none()))
+                    .map(value -> Jsoup.clean(value, Safelist.none()))
                     .orElse(null);
 
             LocalDate date = Optional.ofNullable(opf.selectFirst("metadata > dc|date"))
@@ -38,10 +38,11 @@ public class EpubOPF {
                     .orElse(null);
 
             // TODO: ISBN support
-            String isbn = Optional.ofNullable(opf.select("metadata > dc|identifier"))
+            String isbn = Optional.of(opf.select("metadata > dc|identifier"))  // Заменено на Optional.of()
                     .map(Elements::text)
                     .map(value -> value.toLowerCase().replace("isbn:", ""))
                     .orElse(null);
+
 
             bookArchive.setTitle(title);
             bookArchive.setAuthors(author);
