@@ -7,7 +7,10 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 }
 
-//apply plugin: 'io.franzbecker.gradle-lombok'
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 
 group 'com.atsumeru.web'
 version '1.0.3'
@@ -21,7 +24,7 @@ repositories {
 }
 
 configurations {
-    all*.exclude module : 'spring-boot-starter-json'
+    all*.exclude module: 'spring-boot-starter-json'
 
     developmentOnly
     runtimeClasspath {
@@ -32,7 +35,7 @@ configurations {
 bootJar {
     manifest {
         attributes(
-                'Implementation-Title':  'Atsumeru',
+                'Implementation-Title': 'Atsumeru',
                 'Implementation-Version': version)
     }
 }
@@ -59,28 +62,38 @@ dependencies {
     implementation "org.apache.tomcat.embed:tomcat-embed-jasper"
 
     // Logs
-    implementation "ch.qos.logback:logback-classic:1.2.10"
+    implementation "ch.qos.logback:logback-classic:1.5.8"
 
     // CLI ProgressBar
-    implementation 'me.tongfei:progressbar:0.9.3'
+    implementation 'me.tongfei:progressbar:0.10.1'
 
     // Image manipulation
     implementation 'net.coobird:thumbnailator:0.4.14'
-    implementation 'com.github.trickl:palette:0.1.1'
+    implementation ('com.github.trickl:palette:0.1.1') {
+        exclude group: 'commons-beanutils', module: 'commons-beanutils'
+    }
+
+    // Явно добавляем исправленную версию commons-beanutils
+    implementation ('commons-beanutils:commons-beanutils:1.9.4') {
+        exclude group: 'commons-collections', module: 'commons-collections'
+    }
+
+    // Явно добавляем исправленную версию commons-collections
+    implementation 'org.apache.commons:commons-collections4:4.4'
 
     // ImageIO
     implementation 'com.twelvemonkeys.imageio:imageio-jpeg:3.9.3'
     implementation 'com.twelvemonkeys.imageio:imageio-webp:3.9.3'
 
     // Apache Commons
-    implementation "commons-io:commons-io:2.5"
-    implementation "org.apache.commons:commons-compress:1.20"
+    implementation "commons-io:commons-io:2.16.1"
+    implementation "org.apache.commons:commons-compress:1.27.1"
 
     // Comparators
     implementation "net.grey-panther:natural-comparator:1.1"
 
     // Content detection and Various Archives Support
-    implementation "org.apache.tika:tika-core:1.24.1"
+    implementation "org.apache.tika:tika-core:2.9.2"
     implementation "net.sf.sevenzipjbinding:sevenzipjbinding:16.02-2.01"
     implementation "net.sf.sevenzipjbinding:sevenzipjbinding-all-platforms:16.02-2.01"
 
@@ -88,22 +101,22 @@ dependencies {
     implementation "com.github.ben-manes.caffeine:caffeine:2.9.0"
 
     // JSOUP
-    implementation "org.jsoup:jsoup:1.13.1"
+    implementation "org.jsoup:jsoup:1.18.1"
 
     // JSON
-    implementation 'com.google.code.gson:gson:2.8.5'
-    implementation "org.json:json:20160212"
+    implementation 'com.google.code.gson:gson:2.11.0'
+    implementation "org.json:json:20240303"
     implementation "org.apache.clerezza.ext:org.json.simple:0.4"
 
     // ORM
     implementation "com.j256.ormlite:ormlite-core:5.1"
     implementation "com.j256.ormlite:ormlite-jdbc:5.1"
-    implementation "org.xerial:sqlite-jdbc:3.30.1"
+    implementation "org.xerial:sqlite-jdbc:3.46.1.0"
 
-    // FB2 Parser
+    // FB2 Parser (если возможно, замените на зависимость Maven)
     implementation files("libs/fb2parser.jar")
 
-    // DjVu Reader
+    // DjVu Reader (если возможно, замените на зависимость Maven)
     implementation files("libs/DjVu2Image-1.0.jar")
 
     // PDFBox
@@ -113,11 +126,12 @@ dependencies {
     implementation 'org.hashids:hashids:1.0.3'
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
     options.compilerArgs << '-Xlint:deprecation' << '-Xlint:unchecked'
 }
 
-configurations.all {
+configurations.configureEach {
     resolutionStrategy.eachDependency { DependencyResolveDetails details ->
         if (details.requested.group == 'org.apache.logging.log4j') {
             details.useVersion '2.17.2'
