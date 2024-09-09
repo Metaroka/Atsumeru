@@ -5,7 +5,6 @@ import com.atsumeru.web.json.adapter.LinksBidirectionalAdapter;
 import com.atsumeru.web.model.book.chapter.BookChapter;
 import com.atsumeru.web.model.book.service.BoundService;
 import com.atsumeru.web.model.book.volume.VolumeItem;
-import com.atsumeru.web.model.database.DatabaseFields;
 import com.atsumeru.web.model.database.History;
 import com.atsumeru.web.util.ArrayUtils;
 import com.atsumeru.web.util.StringUtils;
