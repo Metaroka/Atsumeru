@@ -10,3 +10,11 @@
 .idea/
 .gradle/
 build/
+bin/
+cache/
+config/
+database/
+logs/
+parsers/
+temp/
+tmp/
