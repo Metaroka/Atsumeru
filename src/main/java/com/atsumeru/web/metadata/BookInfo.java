@@ -10,8 +10,6 @@ import com.atsumeru.web.model.book.service.BoundService;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +19,6 @@ import static com.atsumeru.web.helper.JSONLogHelper.putJSON;
 
 public class BookInfo {
 
-    // Объявление логгера
-    private static final Logger logger = LoggerFactory.getLogger(BookInfo.class);
 
     public static JSONObject toJSON(BookArchive archive, List<BoundService> boundServices) throws JSONException {
         JSONObject obj = new JSONObject();
@@ -178,9 +174,7 @@ public class BookInfo {
 
         if (servicesArray != null) {
             for (Object object : servicesArray) {
-                if (object instanceof JSONObject) {
-                    JSONObject servicesObject = (JSONObject) object;
-
+                if (object instanceof JSONObject servicesObject) {  // Используем pattern matching
                     ServiceType serviceType = EnumUtils.valueOfOrNull(ServiceType.class, JSONHelper.getStringSafe(servicesObject, "service_type"));
                     if (serviceType != null) {
                         String id = JSONHelper.getStringSafe(servicesObject, "id");
@@ -207,7 +201,6 @@ public class BookInfo {
         putJSON(obj, "alt_title", chapter.getAltTitle());
 
         putJSON(obj, "chapter", chapter.getChapter());
-        putJSON(obj, "description", chapter.getDescription());
 
         // Info lists
         putJSON(obj, "authors", ArrayUtils.splitString(chapter.getAuthors()));
@@ -283,8 +276,7 @@ public class BookInfo {
         JSONArray linksArray = JSONHelper.getArraySafe(obj, "links");
         if (linksArray != null) {
             for (Object object : linksArray) {
-                if (object instanceof JSONObject) {
-                    JSONObject linksObject = (JSONObject) object;
+                if (object instanceof JSONObject linksObject) {  // Используем pattern matching
                     String link = JSONHelper.getStringSafe(linksObject, "link");
                     if (StringUtils.isNotEmpty(link)) {
                         links.add(link);
@@ -292,7 +284,6 @@ public class BookInfo {
                 }
             }
         }
-
         return StringUtils.join(",", links);
     }
 
