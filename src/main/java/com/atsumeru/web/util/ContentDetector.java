@@ -3,6 +3,7 @@ package com.atsumeru.web.util;
 import com.atsumeru.web.enums.BookType;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.exception.TikaException;
+import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 
@@ -38,7 +39,7 @@ public class ContentDetector {
 
     public static String detectMediaType(Path path) {
         Metadata metadata = new Metadata();
-        metadata.add(Metadata.RESOURCE_NAME_KEY, path.getFileName().toString());
+        metadata.add(TikaCoreProperties.RESOURCE_NAME_KEY, path.getFileName().toString());
 
         TikaInputStream tikaInputStream = null;
         try {
